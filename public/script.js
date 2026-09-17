@@ -4,7 +4,7 @@ let selectedSeat = null;
 async function loadSeats() {
 
     try {
-         const response = await fetch(`${API_URL}/seats`);
+         const response = await fetch(`/seats`);
          const seats = await response.json();
          displaySeats(seats);
 

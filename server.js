@@ -1,11 +1,17 @@
 const express = require('express');
 const app = express();
+app.use(express.static("public"));
+app.use(express.json());
 
 const TOTAL_SEATS = 20;
 const CHARACTERS = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789';
 const CODE_LENGTH = 6;
 
-function generateCode(){
+
+const seats = new Map();            
+const activeHoldCodes = new Map();  
+
+function generateCode() {
     let code = '';
     for (let i = 0; i < CODE_LENGTH; i++) {
         const randomIndex = Math.floor(Math.random() * CHARACTERS.length);
@@ -14,22 +20,17 @@ function generateCode(){
     return code;
 }
 
-
-
-const theActiveHolds = new Map();
-
 function generateUniqueHoldCode() {
     let code;
     do {
         code = generateCode();
-    } while (theActiveHolds.has(code));
+    } while (activeHoldCodes.has(code));
     return code;
 }
 
 app.post("/hold-seat", (req, res) => {
 
     const { email, seatNumber } = req.body;
-
 
     if (!email || !email.includes("@")) {
         return res.status(400).json({
@@ -50,7 +51,6 @@ app.post("/hold-seat", (req, res) => {
             message: `Seat number must be between 1 and ${TOTAL_SEATS}`
         });
     }
-
 
     if (seats.has(seat)) {
         return res.status(409).json({
@@ -84,7 +84,6 @@ app.post("/confirm-seat", (req, res) => {
     const { email, holdCode } = req.body;
     const hold = activeHoldCodes.get(holdCode);
 
-
     if (!hold) {
         return res.status(404).json({
             success: false,
@@ -101,7 +100,6 @@ app.post("/confirm-seat", (req, res) => {
 
     const seat = seats.get(hold.seatNumber);
 
-
     if (!seat || seat.status !== "held") {
         return res.status(409).json({
             success: false,
@@ -111,9 +109,7 @@ app.post("/confirm-seat", (req, res) => {
 
     seat.status = "confirmed";
 
-
     activeHoldCodes.delete(holdCode);
-
 
     return res.status(200).json({
         success: true,
@@ -121,7 +117,6 @@ app.post("/confirm-seat", (req, res) => {
         status: "confirmed"
     });
 });
-
 
 app.get("/seats", (req, res) => {
 
@@ -139,7 +134,6 @@ app.get("/seats", (req, res) => {
 
     res.json(result);
 });
-
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");

@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js" ,
+    "start": "nodemon server.js",
     "dev": "nodemon server.js"
   },
   "repository": {
@@ -22,5 +22,8 @@
   "homepage": "https://github.com/mpho09/seating-reservation-system#readme",
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }
